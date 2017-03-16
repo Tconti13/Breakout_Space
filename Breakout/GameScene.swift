@@ -13,10 +13,14 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var ball = SKShapeNode()
     var paddle = SKSpriteNode() //Note that it is not SKShapeNode.
     var brick = SKSpriteNode()
+    var isPlaying = false
+    var button = SKSpriteNode()
     
     override func didMove(to view: SKView) {
         physicsWorld.contactDelegate = self
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
+        
+        
         createBackground()
         makeBall()
         makePaddle()
@@ -24,8 +28,16 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         makeLoseZone()
         ball.physicsBody?.isDynamic = true
         ball.physicsBody?.applyImpulse(CGVector(dx: 5, dy: 3))
+        button = SKSpriteNode(imageNamed: "startButton.png", size: CGSize(width: frame.height/4, height: frame.width/25))
+        button = SKSpriteNode(
+        button.position = CGPoint(x: frame.midX, y: frame.maxY - 10)
+        button.name = "button"
+        button.physicsBody = SKPhysicsBody(rectangleOf: button.size)
+        button.physicsBody?.isDynamic = false
+        addChild(button)
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         for touch in touches {
             let location = touch.location(in: self)
             paddle.position.x = location.x
@@ -36,18 +48,18 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             let location = touch.location(in: self)
             paddle.position.x = location.x
         }
-}
-        func didBegin (_ contact: SKPhysicsContact) {
-            if contact.bodyA.node?.name == "brick" || contact.bodyB.node?.name == "brick" {
-                print("Win")
-                brick.removeFromParent()
-                ball.removeFromParent()
-            }
-            if contact.bodyA.node?.name == "loseZone" || contact.bodyB.node?.name == "loseZone" {
-                print("Lose")
-                ball.removeFromParent()
-            }
+    }
+    func didBegin (_ contact: SKPhysicsContact) {
+        if contact.bodyA.node?.name == "brick" || contact.bodyB.node?.name == "brick" {
+            print("Win")
+            brick.removeFromParent()
+            ball.removeFromParent()
         }
+        if contact.bodyA.node?.name == "loseZone" || contact.bodyB.node?.name == "loseZone" {
+            print("Lose")
+            ball.removeFromParent()
+        }
+    }
     func createBackground() {
         let stars = SKTexture(imageNamed: "stars")
         for i in 0...1 {
@@ -105,5 +117,9 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         loseZone.physicsBody = SKPhysicsBody(rectangleOf: loseZone.size)
         loseZone.physicsBody?.isDynamic = false
         addChild(loseZone)
+    }
+    
+    func reset() {
+        isPlaying = true
     }
 }
