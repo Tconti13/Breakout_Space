@@ -10,6 +10,9 @@ import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene,SKPhysicsContactDelegate {
+    
+    var cont = false
+    
     var ball:SKSpriteNode!
     var paddle:SKSpriteNode!
     var brick:SKSpriteNode!
@@ -44,19 +47,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         
         setUp()
         
-        let stars = SKTexture(imageNamed: "stars")
-        for i in 0...1 {
-            let starsBackground = SKSpriteNode(texture: stars)
-            starsBackground.zPosition = -1
-            starsBackground.position = CGPoint(x: 0, y: starsBackground.size.height * CGFloat(i))
-            starsBackground.size = CGSize(width: frame.width, height: frame.height + 10000)
-            addChild(starsBackground)
-            let moveDown = SKAction.moveBy(x: 0, y: -starsBackground.size.height, duration: 200)
-            let moveReset = SKAction.moveBy(x: 0, y: starsBackground.size.height, duration: 0)
-            let moveLoop = SKAction.sequence([moveDown, moveReset])
-            let moveForever = SKAction.repeatForever(moveLoop)
-            starsBackground.run(moveForever)
-        }
+       createBackGround()
         
     }
     
@@ -68,7 +59,12 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             paddle.position.x = touchLocation.x
             if (button.contains(location)  && (lives == 0 || score == 12) ){
                 button.alpha = 0
+                if cont == false {
                 resetGame()
+                }
+                else  if cont == true{
+                    resetGame2()
+                }
                 ball.physicsBody?.applyImpulse(CGVector(dx: 100, dy: 100))
                 button.isUserInteractionEnabled = false
             }
@@ -124,7 +120,22 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         lives = 3
         scoreLabel.text = "Score: 0"
         livesLabel.text = "Lives: 3"
+        createBackGround()
         setUp()
+        self.view?.isPaused = false
+    }
+    
+    func resetGame2() {
+        button.isUserInteractionEnabled = false
+        ball.removeFromParent()
+        ball.position = CGPoint(x:frame.midX, y: frame.midY - 400)
+        addChild(ball)
+        score = 0
+        lives = 3
+        scoreLabel.text = "Score: 0"
+        livesLabel.text = "Lives: 3"
+        createBackGround()
+        setUp2()
         self.view?.isPaused = false
     }
     
@@ -143,6 +154,22 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         makeBrick(ex: 292.938, why: 443.016)
     }
     
+    func setUp2() {
+        makeBrick(ex: -292.937, why: 600.788)//1
+        makeBrick(ex: -292.937, why: 515.055)//2
+        makeBrick(ex: -292.937, why: 394.597)//3
+        makeBrick(ex: -292.937, why: 253.516)//4
+        makeBrick(ex: -113.04, why: 573.179)//5
+        makeBrick(ex: -128.813, why: 336.473)//6
+        makeBrick(ex: 112.453, why: 573.179)//7
+        makeBrick(ex: 128.812, why: 336.473)//8
+        makeBrick(ex: 292.938, why: 600.788)//9
+        makeBrick(ex: 292.937, why: 515.055)//10
+        makeBrick(ex: 292.938, why: 394.598)
+        makeBrick(ex: 292.938, why: 253.515)
+        cont = !cont
+    }
+    
     func makeBrick(ex: Float, why: Float) {
         brick = SKSpriteNode(color: getRandomColor(), size: CGSize(width: frame.width/5, height: frame.height/25))
         brick.position = CGPoint(x: Int(ex), y: Int(why))
@@ -157,6 +184,22 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         let randomGreen:CGFloat = CGFloat(drand48())
         let randomBlue:CGFloat = CGFloat(drand48())
         return UIColor(red: randomRed, green: randomGreen, blue: randomBlue, alpha: 1.0)
+    }
+    
+    func createBackGround() {
+    let stars = SKTexture(imageNamed: "stars")
+    for i in 0...1 {
+    let starsBackground = SKSpriteNode(texture: stars)
+    starsBackground.zPosition = -1
+    starsBackground.position = CGPoint(x: 0, y: starsBackground.size.height * CGFloat(i))
+    starsBackground.size = CGSize(width: frame.width, height: frame.height + 10000)
+    addChild(starsBackground)
+    let moveDown = SKAction.moveBy(x: 0, y: -starsBackground.size.height, duration: 200)
+    let moveReset = SKAction.moveBy(x: 0, y: starsBackground.size.height, duration: 0)
+    let moveLoop = SKAction.sequence([moveDown, moveReset])
+    let moveForever = SKAction.repeatForever(moveLoop)
+    starsBackground.run(moveForever)
+    }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -175,8 +218,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             button = SKSpriteNode(imageNamed: "reset")
             self.addChild(button)
         }
-        
-        
     }
     
 
